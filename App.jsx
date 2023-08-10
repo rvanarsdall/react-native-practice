@@ -8,7 +8,10 @@ import {
   TextInput,
   View,
   ScrollView,
+  FlatList,
 } from "react-native";
+import GoalItems from "./components/GoalItem";
+import GoalInput from "./components/Goalinput";
 
 export default function App() {
   const [enteredGoal, setEnteredGoal] = useState("");
@@ -19,29 +22,28 @@ export default function App() {
   function addGoalHandler() {
     setGoal((currentGoals) => [...currentGoals, enteredGoal]);
   }
+
+  function deleteGoalHandler(goalId) {
+    setGoal((currentGoals) => {
+      return currentGoals.filter((goal) => goal.id !== goalId);
+    });
+  }
   return (
     <View style={styles.appContainer}>
-      <View style={styles.inputContainer}>
-        <TextInput
-          style={styles.textInput}
-          placeholder="Your Course Goals"
-          onChangeText={goalInputHandler}
-        />
-        <Button
-          title="Add Goals"
-          style={styles.border}
-          onPress={addGoalHandler}
-        />
-      </View>
-
+      <GoalInput
+        goalInputHandler={goalInputHandler}
+        addGoalHandler={addGoalHandler}
+      />
       <View style={styles.goalsContainer}>
-        <ScrollView>
-          {goal.map((goal, index) => (
-            <View style={styles.goalContainer} key={index}>
-              <Text style={styles.goalText}>{goal}</Text>
-            </View>
-          ))}
-        </ScrollView>
+        <FlatList
+          alwaysBounceVertical={false}
+          data={goal}
+          renderItem={(itemData) => {
+            return (
+              <GoalItems itemData={itemData} onDeleteItem={deleteGoalHandler} />
+            );
+          }}
+        ></FlatList>
       </View>
     </View>
   );
@@ -73,12 +75,4 @@ const styles = StyleSheet.create({
     borderWidth: 5,
     borderColor: "red",
   },
-  goalContainer: {
-    margin: 8,
-    padding: 8,
-    borderRadius: 10,
-    backgroundColor: "#5e0acc",
-    color: "white",
-  },
-  goalText: { color: "white", fontWeight: "700" },
 });
